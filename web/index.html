@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>量化交易系统 v1.0</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: #f0f2f6;
+        }
+        .header {
+            background: linear-gradient(135deg, #1f77b4 0%, #2c3e50 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar {
+            width: 320px;
+            background: white;
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .main {
+            margin-left: 320px;
+            flex: 1;
+            padding: 20px;
+        }
+        .section { margin-bottom: 20px; }
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 2px solid #1f77b4;
+            padding-bottom: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        select, input[type="text"], input[type="number"], input[type="date"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1f77b4 0%, #2c3e50 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .btn-primary:hover { opacity: 0.9; }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 5px solid #2196F3;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #1f77b4;
+        }
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .data-table th, .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        .slider-value {
+            display: inline-block;
+            background: #1f77b4;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-left: 10px;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin: 5px 0;
+        }
+        .hidden { display: none !important; }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .metric-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1f77b4;
+        }
+        .expandable {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .expandable-header {
+            background: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .expandable-content {
+            padding: 15px;
+            display: none;
+        }
+        .expandable-content.active {
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; position: relative; height: auto; }
+            .main { margin-left: 0; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">📈 量化交易系统 v1.0</div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="section">
+                <div class="section-title">⚙️ 系统配置</div>
+            </div>
+
+            <div class="section">
+                <label>📊 数据源</label>
+                <select id="dataSource" onchange="onDataSourceChange()">
+                    <option value="mock">模拟数据</option>
+                    <option value="yahoo">Yahoo Finance</option>
+                    <option value="tushare">TuShare</option>
+                </select>
+            </div>
+
+            <div class="section" id="stockSection">
+                <label>📈 股票代码</label>
+                <select id="stockCategory" onchange="onCategoryChange()">
+                    <option value="hot_a">🔥 热门A股</option>
+                    <option value="index">📊 主要指数</option>
+                    <option value="us">🌐 美股热门</option>
+                    <option value="test">🧪 测试用</option>
+                </select>
+                <select id="stockSelect">
+                    <option value="000001.SZ">000001.SZ - 平安银行</option>
+                    <option value="000858.SZ">000858.SZ - 五粮液</option>
+                    <option value="002415.SZ">002415.SZ - 海康威视</option>
+                    <option value="600519.SH">600519.SH - 贵州茅台</option>
+                    <option value="600036.SH">600036.SH - 招商银行</option>
+                    <option value="601318.SH">601318.SH - 中国平安</option>
+                    <option value="000333.SZ">000333.SZ - 美的集团</option>
+                    <option value="002594.SZ">002594.SZ - 比亚迪</option>
+                    <option value="600276.SH">600276.SH - 恒瑞医药</option>
+                    <option value="601012.SH">601012.SH - 隆基绿能</option>
+                </select>
+                <div style="margin-top: 10px;">
+                    <input type="checkbox" id="useCustom" onchange="onCustomChange()">
+                    <label for="useCustom" style="display: inline;">手动输入股票代码</label>
+                </div>
+                <input type="text" id="customSymbol" class="hidden" placeholder="输入股票代码">
+                <div id="symbolFormat" class="hidden">
+                    <div class="expandable-header" onclick="toggleFormat()">📖 股票代码格式说明</div>
+                    <div class="info-box">
+                        <strong>A股代码格式 (TuShare):</strong><br>
+                        深圳证券交易所: 000001.SZ, 002594.SZ<br>
+                        上海证券交易所: 600519.SH, 601318.SH<br><br>
+                        <strong>美股代码 (Yahoo Finance):</strong><br>
+                        直接输入: AAPL, MSFT, TSLA<br><br>
+                        <strong>港股代码 (Yahoo Finance):</strong><br>
+                        格式: 0700.HK, 3690.HK
+                    </div>
+                </div>
+            </div>
+
+            <div class="section hidden" id="tokenSection">
+                <label>TuShare Token</label>
+                <input type="password" id="tushareToken" placeholder="输入TuShare Token">
+            </div>
+
+            <div class="section">
+                <label>📅 日期范围</label>
+                <label>开始日期</label>
+                <input type="date" id="startDate">
+                <label>结束日期</label>
+                <input type="date" id="endDate">
+            </div>
+
+            <div class="section">
+                <label>🎯 交易策略</label>
+                <select id="strategy" onchange="onStrategyChange()">
+                    <option value="ma">移动平均线策略 (MA)</option>
+                    <option value="rsi">RSI策略</option>
+                    <option value="macd">MACD策略</option>
+                    <option value="boll">布林带策略</option>
+                    <option value="kdj">KDJ策略</option>
+                    <option value="ema">EMA策略</option>
+                </select>
+            </div>
+
+            <div class="section" id="strategyParams">
+                <!-- MA策略参数 -->
+                <div id="maParams">
+                    <div class="slider-container">
+                        <label>短期窗口 <span class="slider-value" id="shortWindowVal">10</span></label>
+                        <input type="range" id="shortWindow" min="5" max="50" value="10" oninput="updateSlider('shortWindow', 'shortWindowVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>长期窗口 <span class="slider-value" id="longWindowVal">30</span></label>
+                        <input type="range" id="longWindow" min="20" max="200" value="30" oninput="updateSlider('longWindow', 'longWindowVal')">
+                    </div>
+                </div>
+
+                <!-- RSI策略参数 -->
+                <div id="rsiParams" class="hidden">
+                    <div class="slider-container">
+                        <label>RSI周期 <span class="slider-value" id="rsiWindowVal">14</span></label>
+                        <input type="range" id="rsiWindow" min="2" max="50" value="14" oninput="updateSlider('rsiWindow', 'rsiWindowVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>超卖阈值 <span class="slider-value" id="oversoldVal">30</span></label>
+                        <input type="range" id="oversold" min="10" max="40" value="30" oninput="updateSlider('oversold', 'oversoldVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>超买阈值 <span class="slider-value" id="overboughtVal">70</span></label>
+                        <input type="range" id="overbought" min="60" max="90" value="70" oninput="updateSlider('overbought', 'overboughtVal')">
+                    </div>
+                </div>
+
+                <!-- MACD策略参数 -->
+                <div id="macdParams" class="hidden">
+                    <div class="slider-container">
+                        <label>快速EMA <span class="slider-value" id="fastVal">12</span></label>
+                        <input type="range" id="fast" min="5" max="30" value="12" oninput="updateSlider('fast', 'fastVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>慢速EMA <span class="slider-value" id="slowVal">26</span></label>
+                        <input type="range" id="slow" min="20" max="50" value="26" oninput="updateSlider('slow', 'slowVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>信号线 <span class="slider-value" id="signalVal">9</span></label>
+                        <input type="range" id="signal" min="5" max="20" value="9" oninput="updateSlider('signal', 'signalVal')">
+                    </div>
+                </div>
+
+                <!-- 布林带策略参数 -->
+                <div id="bollParams" class="hidden">
+                    <div class="slider-container">
+                        <label>窗口大小 <span class="slider-value" id="bbWindowVal">20</span></label>
+                        <input type="range" id="bbWindow" min="10" max="50" value="20" oninput="updateSlider('bbWindow', 'bbWindowVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>标准差倍数 <span class="slider-value" id="numStdVal">2</span></label>
+                        <input type="range" id="numStd" min="1" max="4" value="2" oninput="updateSlider('numStd', 'numStdVal')">
+                    </div>
+                </div>
+
+                <!-- KDJ策略参数 -->
+                <div id="kdjParams" class="hidden">
+                    <div class="slider-container">
+                        <label>K线周期 <span class="slider-value" id="kWindowVal">9</span></label>
+                        <input type="range" id="kWindow" min="5" max="30" value="9" oninput="updateSlider('kWindow', 'kWindowVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>D线周期 <span class="slider-value" id="dWindowVal">3</span></label>
+                        <input type="range" id="dWindow" min="1" max="10" value="3" oninput="updateSlider('dWindow', 'dWindowVal')">
+                    </div>
+                </div>
+
+                <!-- EMA策略参数 -->
+                <div id="emaParams" class="hidden">
+                    <div class="slider-container">
+                        <label>短期EMA <span class="slider-value" id="emaShortVal">12</span></label>
+                        <input type="range" id="emaShort" min="5" max="30" value="12" oninput="updateSlider('emaShort', 'emaShortVal')">
+                    </div>
+                    <div class="slider-container">
+                        <label>长期EMA <span class="slider-value" id="emaLongVal">26</span></label>
+                        <input type="range" id="emaLong" min="20" max="50" value="26" oninput="updateSlider('emaLong', 'emaLongVal')">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>💰 初始资金 (¥)</label>
+                <input type="number" id="initialCapital" value="100000" min="1000" max="100000000" step="10000">
+            </div>
+
+            <div class="section">
+                <button class="btn-primary" onclick="loadData()">📥 加载数据</button>
+                <button class="btn-primary" onclick="runBacktest()">🚀 运行回测</button>
+            </div>
+
+            <div class="expandable">
+                <div class="expandable-header" onclick="toggleInstructions()">📖 使用说明</div>
+                <div class="expandable-content" id="instructions">
+                    <h4>使用步骤</h4>
+                    <ol>
+                        <li><strong>配置数据源</strong>：选择数据源类型，输入股票代码</li>
+                        <li><strong>设置策略参数</strong>：选择交易策略并调整参数</li>
+                        <li><strong>设置资金</strong>：输入初始资金金额</li>
+                        <li><strong>加载数据</strong>：点击"加载数据"按钮</li>
+                        <li><strong>运行回测</strong>：点击"运行回测"按钮查看结果</li>
+                    </ol>
+                    <h4>支持的数据源</h4>
+                    <ul>
+                        <li><strong>模拟数据</strong>：生成随机模拟数据，无需配置</li>
+                        <li><strong>TuShare</strong>：需要TuShare Token，支持A股数据</li>
+                        <li><strong>Yahoo Finance</strong>：无需Token，支持全球股票</li>
+                    </ul>
+                    <h4>支持的交易策略</h4>
+                    <ul>
+                        <li>移动平均线策略 (MA)</li>
+                        <li>RSI策略</li>
+                        <li>MACD策略</li>
+                        <li>布林带策略</li>
+                        <li>KDJ策略</li>
+                        <li>EMA策略</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="main">
+            <!-- 数据预览 -->
+            <div id="dataPreview" class="hidden">
+                <h3>📋 数据预览</h3>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-label">数据条数</div>
+                        <div class="metric-number" id="dataCount">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">起始日期</div>
+                        <div class="metric-number" id="dataStart">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">结束日期</div>
+                        <div class="metric-number" id="dataEnd">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">最新收盘价</div>
+                        <div class="metric-number" id="dataClose">-</div>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>开盘</th>
+                            <th>最高</th>
+                            <th>最低</th>
+                            <th>收盘</th>
+                            <th>成交量</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- K线图 -->
+            <div id="priceChartSection" class="chart-container hidden">
+                <h3>📊 股票价格走势</h3>
+                <div id="priceChart" style="height: 500px;"></div>
+            </div>
+
+            <!-- 回测结果 -->
+            <div id="backtestResult" class="hidden">
+                <h3>📊 回测结果</h3>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <div class="metric-label">初始资金</div>
+                        <div class="metric-number" id="resultInitial">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">最终价值</div>
+                        <div class="metric-number" id="resultFinal">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">总收益率</div>
+                        <div class="metric-number" id="resultReturn">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">夏普比率</div>
+                        <div class="metric-number" id="resultSharpe">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">最大回撤</div>
+                        <div class="metric-number" id="resultDrawdown">-</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-label">交易次数</div>
+                        <div class="metric-number" id="resultTrades">-</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <h3>📈 资金曲线</h3>
+                    <div id="equityChart" style="height: 500px;"></div>
+                </div>
+
+                <h3>📝 交易记录</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>日期</th>
+                            <th>股票代码</th>
+                            <th>操作</th>
+                            <th>数量</th>
+                            <th>价格</th>
+                            <th>总金额</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradesTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 股票分类数据
+        const stockCategories = {
+            hot_a: {
+                label: "🔥 热门A股",
+                stocks: [
+                    { code: "000001.SZ", name: "平安银行" },
+                    { code: "000858.SZ", name: "五粮液" },
+                    { code: "002415.SZ", name: "海康威视" },
+                    { code: "600519.SH", name: "贵州茅台" },
+                    { code: "600036.SH", name: "招商银行" },
+                    { code: "601318.SH", name: "中国平安" },
+                    { code: "000333.SZ", name: "美的集团" },
+                    { code: "002594.SZ", name: "比亚迪" },
+                    { code: "600276.SH", name: "恒瑞医药" },
+                    { code: "601012.SH", name: "隆基绿能" }
+                ]
+            },
+            index: {
+                label: "📊 主要指数",
+                stocks: [
+                    { code: "000001.SH", name: "上证指数" },
+                    { code: "399001.SZ", name: "深证成指" },
+                    { code: "399006.SZ", name: "创业板指" },
+                    { code: "000300.SH", name: "沪深300" },
+                    { code: "000016.SH", name: "上证50" },
+                    { code: "000905.SH", name: "中证500" }
+                ]
+            },
+            us: {
+                label: "🌐 美股热门",
+                stocks: [
+                    { code: "AAPL", name: "苹果公司" },
+                    { code: "MSFT", name: "微软" },
+                    { code: "GOOGL", name: "谷歌" },
+                    { code: "AMZN", name: "亚马逊" },
+                    { code: "TSLA", name: "特斯拉" },
+                    { code: "NVDA", name: "英伟达" },
+                    { code: "META", name: "Meta" },
+                    { code: "BABA", name: "阿里巴巴" }
+                ]
+            },
+            test: {
+                label: "🧪 测试用",
+                stocks: [
+                    { code: "TEST", name: "模拟测试" }
+                ]
+            }
+        };
+
+        let currentData = null;
+        let backtestResult = null;
+
+        // 初始化日期
+        document.getElementById('endDate').valueAsDate = new Date();
+        document.getElementById('startDate').valueAsDate = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+
+        function onDataSourceChange() {
+            const source = document.getElementById('dataSource').value;
+            const tokenSection = document.getElementById('tokenSection');
+            if (source === 'tushare') {
+                tokenSection.classList.remove('hidden');
+            } else {
+                tokenSection.classList.add('hidden');
+            }
+        }
+
+        function onCategoryChange() {
+            const category = document.getElementById('stockCategory').value;
+            const stockSelect = document.getElementById('stockSelect');
+            const stocks = stockCategories[category].stocks;
+
+            stockSelect.innerHTML = stocks.map(s =>
+                `<option value="${s.code}">${s.code} - ${s.name}</option>`
+            ).join('');
+        }
+
+        function onCustomChange() {
+            const useCustom = document.getElementById('useCustom').checked;
+            const customSymbol = document.getElementById('customSymbol');
+            const symbolFormat = document.getElementById('symbolFormat');
+            const stockSelect = document.getElementById('stockSelect');
+
+            if (useCustom) {
+                customSymbol.classList.remove('hidden');
+                symbolFormat.classList.remove('hidden');
+                stockSelect.classList.add('hidden');
+            } else {
+                customSymbol.classList.add('hidden');
+                symbolFormat.classList.add('hidden');
+                stockSelect.classList.remove('hidden');
+            }
+        }
+
+        function toggleFormat() {
+            const el = document.getElementById('symbolFormat');
+            el.classList.toggle('hidden');
+        }
+
+        function toggleInstructions() {
+            const el = document.getElementById('instructions');
+            el.classList.toggle('active');
+        }
+
+        function onStrategyChange() {
+            const strategy = document.getElementById('strategy').value;
+
+            // 隐藏所有参数
+            ['maParams', 'rsiParams', 'macdParams', 'bollParams', 'kdjParams', 'emaParams'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+
+            // 显示对应参数
+            document.getElementById(strategy + 'Params').classList.remove('hidden');
+        }
+
+        function updateSlider(sliderId, valueId) {
+            document.getElementById(valueId).textContent = document.getElementById(sliderId).value;
+        }
+
+        // 生成模拟数据
+        function generateMockData(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const dates = [];
+            let current = new Date(start);
+
+            while (current <= end) {
+                if (current.getDay() < 5) {
+                    dates.push(new Date(current));
+                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            let price = 100;
+            const data = {
+                dates: [],
+                open: [],
+                high: [],
+                low: [],
+                close: [],
+                volume: []
+            };
+
+            for (const date of dates) {
+                price += (Math.random() - 0.5) * 2;
+                const open = price + (Math.random() - 0.5) * 0.5;
+                const close = price + (Math.random() - 0.5) * 0.5;
+                const high = Math.max(open, close) + Math.random() * 2;
+                const low = Math.min(open, close) - Math.random() * 2;
+                const volume = Math.floor(Math.random() * 4000000) + 1000000;
+
+                data.dates.push(date.toISOString().split('T')[0]);
+                data.open.push(open);
+                data.high.push(high);
+                data.low.push(low);
+                data.close.push(close);
+                data.volume.push(volume);
+
+                price = close;
+            }
+
+            return data;
+        }
+
+        // 技术指标计算
+        function calculateSMA(data, window) {
+            const sma = [];
+            for (let i = 0; i < data.length; i++) {
+                if (i < window - 1) {
+                    sma.push(null);
+                } else {
+                    let sum = 0;
+                    for (let j = 0; j < window; j++) {
+                        sum += data[i - j];
+                    }
+                    sma.push(sum / window);
+                }
+            }
+            return sma;
+        }
+
+        function calculateEMA(data, window) {
+            const ema = [];
+            const multiplier = 2 / (window + 1);
+            let prevEMA = data[0];
+
+            for (let i = 0; i < data.length; i++) {
+                if (i === 0) {
+                    ema.push(data[0]);
+                } else {
+                    const currentEMA = (data[i] - prevEMA) * multiplier + prevEMA;
+                    ema.push(currentEMA);
+                    prevEMA = currentEMA;
+                }
+            }
+            return ema;
+        }
+
+        function calculateRSI(data, window) {
+            const rsi = [];
+            for (let i = 0; i < data.length; i++) {
+                if (i < window) {
+                    rsi.push(null);
+                    continue;
+                }
+                let gains = 0, losses = 0;
+                for (let j = i - window + 1; j <= i; j++) {
+                    const change = data[j] - data[j - 1];
+                    if (change > 0) gains += change;
+                    else losses -= change;
+                }
+                const avgGain = gains / window;
+                const avgLoss = losses / window;
+                const rs = avgGain / (avgLoss || 1);
+                rsi.push(100 - (100 / (1 + rs)));
+            }
+            return rsi;
+        }
+
+        function calculateMACD(data, fast, slow, signal) {
+            const emaFast = calculateEMA(data, fast);
+            const emaSlow = calculateEMA(data, slow);
+            const macdLine = emaFast.map((v, i) => v - emaSlow[i]);
+            const signalLine = calculateEMA(macdLine, signal);
+            const histogram = macdLine.map((v, i) => v - signalLine[i]);
+            return { macdLine, signalLine, histogram };
+        }
+
+        function calculateBollingerBands(data, window, numStd) {
+            const ma = calculateSMA(data, window);
+            const upper = [];
+            const lower = [];
+
+            for (let i = 0; i < data.length; i++) {
+                if (i < window - 1) {
+                    upper.push(null);
+                    lower.push(null);
+                } else {
+                    let sum = 0;
+                    for (let j = 0; j < window; j++) {
+                        sum += Math.pow(data[i - j] - ma[i], 2);
+                    }
+                    const std = Math.sqrt(sum / window);
+                    upper.push(ma[i] + std * numStd);
+                    lower.push(ma[i] - std * numStd);
+                }
+            }
+            return { upper, middle: ma, lower };
+        }
+
+        function calculateStochastic(data, kWindow, dWindow) {
+            const kPercent = [];
+            for (let i = 0; i < data.length; i++) {
+                if (i < kWindow - 1) {
+                    kPercent.push(null);
+                    continue;
+                }
+                let lowest = data[i];
+                let highest = data[i];
+                for (let j = i - kWindow + 1; j <= i; j++) {
+                    lowest = Math.min(lowest, data[j]);
+                    highest = Math.max(highest, data[j]);
+                }
+                const range = highest - lowest || 1;
+                kPercent.push(100 * (data[i] - lowest) / range);
+            }
+            const dPercent = calculateSMA(kPercent.filter(v => v !== null), dWindow);
+            while (dPercent.length < kPercent.length) dPercent.unshift(null);
+            return { kPercent, dPercent };
+        }
+
+        // 生成交易信号
+        function generateSignals(data, strategy) {
+            const signals = new Array(data.length).fill(0);
+            const closes = data.close;
+
+            switch (strategy) {
+                case 'ma': {
+                    const shortWindow = parseInt(document.getElementById('shortWindow').value);
+                    const longWindow = parseInt(document.getElementById('longWindow').value);
+                    const shortMA = calculateSMA(closes, shortWindow);
+                    const longMA = calculateSMA(closes, longWindow);
+                    for (let i = longWindow; i < closes.length; i++) {
+                        if (shortMA[i] > longMA[i] && shortMA[i - 1] <= longMA[i - 1]) {
+                            signals[i] = 1;
+                        } else if (shortMA[i] < longMA[i] && shortMA[i - 1] >= longMA[i - 1]) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+                case 'rsi': {
+                    const rsiWindow = parseInt(document.getElementById('rsiWindow').value);
+                    const oversold = parseInt(document.getElementById('oversold').value);
+                    const overbought = parseInt(document.getElementById('overbought').value);
+                    const rsi = calculateRSI(closes, rsiWindow);
+                    for (let i = rsiWindow; i < closes.length; i++) {
+                        if (rsi[i] < oversold && rsi[i - 1] >= oversold) {
+                            signals[i] = 1;
+                        } else if (rsi[i] > overbought && rsi[i - 1] <= overbought) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+                case 'macd': {
+                    const fast = parseInt(document.getElementById('fast').value);
+                    const slow = parseInt(document.getElementById('slow').value);
+                    const signal = parseInt(document.getElementById('signal').value);
+                    const macd = calculateMACD(closes, fast, slow, signal);
+                    for (let i = slow; i < closes.length; i++) {
+                        if (macd.macdLine[i] > macd.signalLine[i] && macd.macdLine[i - 1] <= macd.signalLine[i - 1]) {
+                            signals[i] = 1;
+                        } else if (macd.macdLine[i] < macd.signalLine[i] && macd.macdLine[i - 1] >= macd.signalLine[i - 1]) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+                case 'boll': {
+                    const bbWindow = parseInt(document.getElementById('bbWindow').value);
+                    const numStd = parseInt(document.getElementById('numStd').value);
+                    const bb = calculateBollingerBands(closes, bbWindow, numStd);
+                    for (let i = bbWindow; i < closes.length; i++) {
+                        if (closes[i] < bb.lower[i]) {
+                            signals[i] = 1;
+                        } else if (closes[i] > bb.upper[i]) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+                case 'kdj': {
+                    const kWindow = parseInt(document.getElementById('kWindow').value);
+                    const dWindow = parseInt(document.getElementById('dWindow').value);
+                    const stoch = calculateStochastic(closes, kWindow, dWindow);
+                    for (let i = kWindow; i < closes.length; i++) {
+                        if (stoch.kPercent[i] > stoch.dPercent[i] && stoch.kPercent[i - 1] <= stoch.dPercent[i - 1] && stoch.kPercent[i] < 20) {
+                            signals[i] = 1;
+                        } else if (stoch.kPercent[i] < stoch.dPercent[i] && stoch.kPercent[i - 1] >= stoch.dPercent[i - 1] && stoch.kPercent[i] > 80) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+                case 'ema': {
+                    const emaShort = parseInt(document.getElementById('emaShort').value);
+                    const emaLong = parseInt(document.getElementById('emaLong').value);
+                    const shortEMA = calculateEMA(closes, emaShort);
+                    const longEMA = calculateEMA(closes, emaLong);
+                    for (let i = emaLong; i < closes.length; i++) {
+                        if (shortEMA[i] > longEMA[i] && shortEMA[i - 1] <= longEMA[i - 1]) {
+                            signals[i] = 1;
+                        } else if (shortEMA[i] < longEMA[i] && shortEMA[i - 1] >= longEMA[i - 1]) {
+                            signals[i] = -1;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            return signals;
+        }
+
+        // 运行回测
+        function runBacktestEngine(data, signals, symbol, initialCapital) {
+            let cash = initialCapital;
+            let portfolio = 0;
+            const trades = [];
+            const equityCurve = [];
+            let position = 0;
+            let entryPrice = 0;
+
+            for (let i = 0; i < data.length; i++) {
+                const price = data.close[i];
+                const signal = signals[i];
+                const date = data.dates[i];
+
+                if (signal === 1 && position === 0) {
+                    const quantity = Math.floor(cash * 0.95 / price);
+                    if (quantity > 0) {
+                        const cost = quantity * price;
+                        cash -= cost;
+                        position = quantity;
+                        entryPrice = price;
+                        trades.push({ date, symbol, action: 'BUY', quantity, price, total: cost });
+                    }
+                } else if (signal === -1 && position > 0) {
+                    const proceeds = position * price;
+                    cash += proceeds;
+                    trades.push({ date, symbol, action: 'SELL', quantity: position, price, total: proceeds });
+                    position = 0;
+                }
+
+                const portfolioValue = cash + position * price;
+                equityCurve.push({ date, portfolio_value: portfolioValue, cash, holdings: position * price });
+            }
+
+            const finalValue = cash + position * data.close[data.length - 1];
+            const totalReturn = (finalValue - initialCapital) / initialCapital;
+
+            // 计算收益率序列
+            const returns = [];
+            for (let i = 1; i < equityCurve.length; i++) {
+                returns.push((equityCurve[i].portfolio_value - equityCurve[i - 1].portfolio_value) / equityCurve[i - 1].portfolio_value);
+            }
+
+            // 计算夏普比率
+            const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length * 252;
+            const stdReturn = Math.sqrt(returns.reduce((sq, n) => sq + Math.pow(n - returns.reduce((a, b) => a + b, 0) / returns.length, 2), 0) / returns.length) * Math.sqrt(252);
+            const sharpeRatio = stdReturn > 0 ? (meanReturn - 0.03) / stdReturn : 0;
+
+            // 计算最大回撤
+            let peak = equityCurve[0].portfolio_value;
+            let maxDrawdown = 0;
+            for (const point of equityCurve) {
+                if (point.portfolio_value > peak) peak = point.portfolio_value;
+                const drawdown = (peak - point.portfolio_value) / peak;
+                if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+            }
+
+            return {
+                initial_capital: initialCapital,
+                final_value: finalValue,
+                total_return: totalReturn,
+                total_return_pct: totalReturn * 100,
+                sharpe_ratio: sharpeRatio,
+                max_drawdown: maxDrawdown * 100,
+                total_trades: trades.length,
+                buy_trades: trades.filter(t => t.action === 'BUY').length,
+                sell_trades: trades.filter(t => t.action === 'SELL').length,
+                equity_curve: equityCurve,
+                trades
+            };
+        }
+
+        async function loadData() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const dataSource = document.getElementById('dataSource').value;
+
+            let symbol;
+            if (document.getElementById('useCustom').checked) {
+                symbol = document.getElementById('customSymbol').value;
+            } else {
+                symbol = document.getElementById('stockSelect').value;
+            }
+
+            if (!startDate || !endDate) {
+                alert('请选择日期范围');
+                return;
+            }
+
+            if (dataSource === 'tushare' && !document.getElementById('tushareToken').value) {
+                alert('请输入TuShare Token');
+                return;
+            }
+
+            // 生成模拟数据
+            currentData = generateMockData(startDate, endDate);
+            currentData.symbol = symbol;
+
+            // 显示数据预览
+            document.getElementById('dataPreview').classList.remove('hidden');
+            document.getElementById('priceChartSection').classList.remove('hidden');
+
+            document.getElementById('dataCount').textContent = currentData.dates.length;
+            document.getElementById('dataStart').textContent = currentData.dates[0];
+            document.getElementById('dataEnd').textContent = currentData.dates[currentData.dates.length - 1];
+            document.getElementById('dataClose').textContent = '¥' + currentData.close[currentData.close.length - 1].toFixed(2);
+
+            // 填充数据表格
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            for (let i = Math.max(0, currentData.dates.length - 20); i < currentData.dates.length; i++) {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${currentData.dates[i]}</td>
+                    <td>¥${currentData.open[i].toFixed(2)}</td>
+                    <td>¥${currentData.high[i].toFixed(2)}</td>
+                    <td>¥${currentData.low[i].toFixed(2)}</td>
+                    <td>¥${currentData.close[i].toFixed(2)}</td>
+                    <td>${currentData.volume[i].toLocaleString()}</td>
+                `;
+            }
+
+            // 绘制K线图
+            const candlestick = {
+                x: currentData.dates,
+                open: currentData.open,
+                high: currentData.high,
+                low: currentData.low,
+                close: currentData.close,
+                type: 'candlestick',
+                name: 'K线',
+                increasing: { line: { color: '#26a69a' }, fillcolor: '#26a69a' },
+                decreasing: { line: { color: '#ef5350' }, fillcolor: '#ef5350' }
+            };
+
+            const volume = {
+                x: currentData.dates,
+                y: currentData.volume,
+                type: 'bar',
+                name: '成交量',
+                marker: {
+                    color: currentData.close.map((c, i) => c >= currentData.open[i] ? '#26a69a' : '#ef5350')
+                },
+                yaxis: 'y2'
+            };
+
+            const layout = {
+                title: `${symbol} 股票价格走势`,
+                xaxis: { title: '日期', rangeslider: { visible: false } },
+                yaxis: { title: '价格', domain: [0.3, 1] },
+                yaxis2: { title: '成交量', domain: [0, 0.2] },
+                height: 500
+            };
+
+            Plotly.newPlot('priceChart', [candlestick, volume], layout);
+        }
+
+        function runBacktest() {
+            if (!currentData) {
+                alert('请先加载数据');
+                return;
+            }
+
+            const strategy = document.getElementById('strategy').value;
+            const initialCapital = parseFloat(document.getElementById('initialCapital').value);
+
+            let symbol;
+            if (document.getElementById('useCustom').checked) {
+                symbol = document.getElementById('customSymbol').value;
+            } else {
+                symbol = document.getElementById('stockSelect').value;
+            }
+
+            const signals = generateSignals(currentData, strategy);
+            backtestResult = runBacktestEngine(currentData, signals, symbol, initialCapital);
+
+            // 显示回测结果
+            document.getElementById('backtestResult').classList.remove('hidden');
+
+            document.getElementById('resultInitial').textContent = '¥' + backtestResult.initial_capital.toLocaleString();
+            document.getElementById('resultFinal').textContent = '¥' + backtestResult.final_value.toLocaleString();
+            document.getElementById('resultReturn').textContent = (backtestResult.total_return_pct >= 0 ? '+' : '') + backtestResult.total_return_pct.toFixed(2) + '%';
+            document.getElementById('resultReturn').className = 'metric-number ' + (backtestResult.total_return_pct >= 0 ? 'positive' : 'negative');
+            document.getElementById('resultSharpe').textContent = backtestResult.sharpe_ratio.toFixed(2);
+            document.getElementById('resultDrawdown').textContent = backtestResult.max_drawdown.toFixed(2) + '%';
+            document.getElementById('resultTrades').textContent = backtestResult.total_trades;
+
+            // 绘制资金曲线
+            const equityTrace = {
+                x: backtestResult.equity_curve.map(p => p.date),
+                y: backtestResult.equity_curve.map(p => p.portfolio_value),
+                type: 'scatter',
+                mode: 'lines',
+                name: '总资产',
+                line: { color: 'blue', width: 2 }
+            };
+
+            const initialTrace = {
+                x: backtestResult.equity_curve.map(p => p.date),
+                y: backtestResult.equity_curve.map(() => backtestResult.initial_capital),
+                type: 'scatter',
+                mode: 'lines',
+                name: '初始资金',
+                line: { color: 'gray', dash: 'dash' }
+            };
+
+            const holdingsTrace = {
+                x: backtestResult.equity_curve.map(p => p.date),
+                y: backtestResult.equity_curve.map(p => p.holdings),
+                type: 'scatter',
+                mode: 'lines',
+                name: '持仓市值',
+                fill: 'tozeroy',
+                line: { color: 'orange' }
+            };
+
+            const cashTrace = {
+                x: backtestResult.equity_curve.map(p => p.date),
+                y: backtestResult.equity_curve.map(p => p.cash),
+                type: 'scatter',
+                mode: 'lines',
+                name: '现金',
+                line: { color: 'green' }
+            };
+
+            const equityLayout = {
+                title: `回测结果 - 总收益率: ${backtestResult.total_return_pct.toFixed(2)}%`,
+                xaxis: { title: '日期' },
+                yaxis: { title: '金额' },
+                height: 500
+            };
+
+            Plotly.newPlot('equityChart', [equityTrace, initialTrace, holdingsTrace, cashTrace], equityLayout);
+
+            // 填充交易记录
+            const tradesBody = document.getElementById('tradesTableBody');
+            tradesBody.innerHTML = '';
+            for (const trade of backtestResult.trades) {
+                const row = tradesBody.insertRow();
+                row.innerHTML = `
+                    <td>${trade.date}</td>
+                    <td>${trade.symbol}</td>
+                    <td>${trade.action === 'BUY' ? '买入' : '卖出'}</td>
+                    <td>${trade.quantity}</td>
+                    <td>¥${trade.price.toFixed(2)}</td>
+                    <td>¥${trade.total.toLocaleString()}</td>
+                `;
+            }
+
+            // 在K线图上标记买卖点
+            const buyPoints = backtestResult.trades.filter(t => t.action === 'BUY').map(t => ({
+                x: t.date,
+                y: t.price,
+                type: 'scatter',
+                mode: 'markers',
+                marker: { symbol: 'triangle-up', size: 15, color: 'red' },
+                name: '买入'
+            }));
+
+            const sellPoints = backtestResult.trades.filter(t => t.action === 'SELL').map(t => ({
+                x: t.date,
+                y: t.price,
+                type: 'scatter',
+                mode: 'markers',
+                marker: { symbol: 'triangle-down', size: 15, color: 'green' },
+                name: '卖出'
+            }));
+        }
+    </script>
+</body>
+</html>
