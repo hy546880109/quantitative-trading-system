@@ -6,6 +6,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import math
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -242,23 +243,29 @@ def get_strategy(strategy_name, params):
         )
     return MovingAverageStrategy()
 
-def format_price(price: float, symbol: str) -> str:
+def format_price(price: float | None, symbol: str) -> str:
     """
     根据股票代码格式化价格显示
 
     Args:
-        price: 价格数值
+        price: 价格数值（支持None、NaN等异常值）
         symbol: 股票代码
 
     Returns:
         格式化的价格字符串（美股指数用$，其他用¥）
     """
-    if symbol.startswith('^'):
-        # 美股指数用美元符号，添加千位分隔符
-        return f"${price:,.2f}"
-    else:
-        # A股用人民币符号
-        return f"¥{price:,.2f}"
+    # Handle invalid prices
+    if price is None or not isinstance(price, (int, float)):
+        return "--"
+    if math.isnan(price) or math.isinf(price):
+        return "--"
+
+    # Determine currency based on symbol
+    # US indices (^DJI, ^GSPC, ^IXIC) and US stocks (no dots, all caps) use $
+    is_us_market = symbol.startswith('^') or (symbol.isupper() and '.' not in symbol)
+
+    currency = "$" if is_us_market else "¥"
+    return f"{currency}{price:,.2f}"
 
 def plot_candlestick(df, trades=None):
     """绘制K线图"""
