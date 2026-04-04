@@ -357,13 +357,6 @@ def main():
     with st.sidebar:
         st.header("⚙️ 系统配置")
 
-        # 数据源配置
-        st.subheader("📊 数据源")
-        data_source = st.selectbox(
-            "选择数据源",
-            ["模拟数据", "TuShare", "Yahoo Finance"]
-        )
-
         # 股票代码选择
         st.subheader("📈 股票代码")
 
@@ -441,6 +434,26 @@ def main():
                 **港股代码** (Yahoo Finance):
                 - 格式: `0700.HK`, `3690.HK`
                 """)
+
+        # 数据源配置
+        st.subheader("📊 数据源")
+
+        # 检查是否为美股指数
+        if stock_category == "🇺🇸 美股指数":
+            # 美股指数强制使用Yahoo Finance
+            st.info("ℹ️ 美股指数使用 Yahoo Finance 数据源")
+            data_source = st.selectbox(
+                "选择数据源",
+                ["Yahoo Finance"],
+                disabled=True,
+                help="美股指数仅支持Yahoo Finance数据源"
+            )
+        else:
+            # 其他分类正常选择数据源
+            data_source = st.selectbox(
+                "选择数据源",
+                ["模拟数据", "TuShare", "Yahoo Finance"]
+            )
 
         if data_source == "TuShare":
             token = st.text_input("TuShare Token", type="password")
