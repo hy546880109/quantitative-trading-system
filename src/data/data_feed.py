@@ -122,11 +122,16 @@ class YahooFinanceDataFeed(DataFeedInterface):
 
     def _convert_symbol(self, symbol: str) -> str:
         """转换股票代码格式"""
+        # 美股指数代码（^开头）保持不变
+        if symbol.startswith('^'):
+            return symbol
+
         # 中国A股转换
         if symbol.endswith('.SH'):
             return symbol.replace('.SH', '.SS')
         elif symbol.endswith('.SZ'):
             return symbol.replace('.SZ', '.SZ')
+
         return symbol
 
     def fetch_daily_data(self, symbol: str, start_date: str, end_date: str) -> List[BarData]:
