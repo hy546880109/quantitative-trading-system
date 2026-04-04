@@ -604,14 +604,14 @@ def main():
             st.metric("最新收盘价", format_price(latest_close, symbol))
 
         # 数据表格
+        # 使用智能货币格式化
+        display_df = st.session_state.data.head(20).copy()
+        price_cols = ['open', 'high', 'low', 'close']
+        for col in price_cols:
+            display_df[col] = display_df[col].apply(lambda x: format_price(x, symbol))
+
         st.dataframe(
-            st.session_state.data.head(20).style.format({
-                'open': '¥{:.2f}',
-                'high': '¥{:.2f}',
-                'low': '¥{:.2f}',
-                'close': '¥{:.2f}',
-                'volume': '{:,.0f}'
-            }),
+            display_df.style.format({'volume': '{:,.0f}'}),
             use_container_width=True
         )
 
@@ -643,8 +643,8 @@ def main():
         # 指标卡片
         cols = st.columns(6)
         metrics = [
-            ("初始资金", f"¥{result['initial_capital']:,.2f}"),
-            ("最终价值", f"¥{result['final_value']:,.2f}"),
+            ("初始资金", format_price(result['initial_capital'], symbol)),
+            ("最终价值", format_price(result['final_value'], symbol)),
             ("总收益率", f"{result['total_return_pct']:.2f}%"),
             ("夏普比率", f"{result['sharpe_ratio']:.2f}"),
             ("最大回撤", f"{result['max_drawdown']:.2f}%"),
@@ -667,8 +667,13 @@ def main():
         if result['trades']:
             trades_df = pd.DataFrame(result['trades'])
             trades_df['date'] = pd.to_datetime(trades_df['date']).dt.strftime('%Y-%m-%d')
-            trades_df['price'] = trades_df['price'].apply(lambda x: f"¥{x:.2f}")
-            trades_df['total'] = trades_df['total'].apply(lambda x: f"¥{x:,.2f}")
+            # 使用智能货币格式化 - 使用每行的symbol字段
+            trades_df['price'] = trades_df.apply(
+                lambda row: format_price(row['price'], row['symbol']), axis=1
+            )
+            trades_df['total'] = trades_df.apply(
+                lambda row: format_price(row['total'], row['symbol']), axis=1
+            )
             trades_df.columns = ['日期', '股票代码', '操作', '数量', '价格', '总金额']
             st.dataframe(trades_df, use_container_width=True)
         else:
