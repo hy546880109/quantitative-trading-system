@@ -763,7 +763,7 @@
 
         // 生成交易信号
         function generateSignals(data, strategy) {
-            const signals = new Array(data.length).fill(0);
+            const signals = new Array(data.close.length).fill(0);
             const closes = data.close;
 
             switch (strategy) {
@@ -863,7 +863,7 @@
             let position = 0;
             let entryPrice = 0;
 
-            for (let i = 0; i < data.length; i++) {
+            for (let i = 0; i < data.close.length; i++) {
                 const price = data.close[i];
                 const signal = signals[i];
                 const date = data.dates[i];
@@ -888,7 +888,7 @@
                 equityCurve.push({ date, portfolio_value: portfolioValue, cash, holdings: position * price });
             }
 
-            const finalValue = cash + position * data.close[data.length - 1];
+            const finalValue = cash + position * data.close[data.close.length - 1];
             const totalReturn = (finalValue - initialCapital) / initialCapital;
 
             // 计算收益率序列
@@ -898,17 +898,24 @@
             }
 
             // 计算夏普比率
-            const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length * 252;
-            const stdReturn = Math.sqrt(returns.reduce((sq, n) => sq + Math.pow(n - returns.reduce((a, b) => a + b, 0) / returns.length, 2), 0) / returns.length) * Math.sqrt(252);
-            const sharpeRatio = stdReturn > 0 ? (meanReturn - 0.03) / stdReturn : 0;
+            let sharpeRatio = 0;
+            if (returns.length > 0) {
+                const meanReturn = returns.reduce((a, b) => a + b, 0) / returns.length * 252;
+                const meanForStd = returns.reduce((a, b) => a + b, 0) / returns.length;
+                const variance = returns.reduce((sq, n) => sq + Math.pow(n - meanForStd, 2), 0) / returns.length;
+                const stdReturn = Math.sqrt(variance) * Math.sqrt(252);
+                sharpeRatio = stdReturn > 0 ? (meanReturn - 0.03) / stdReturn : 0;
+            }
 
             // 计算最大回撤
-            let peak = equityCurve[0].portfolio_value;
             let maxDrawdown = 0;
-            for (const point of equityCurve) {
-                if (point.portfolio_value > peak) peak = point.portfolio_value;
-                const drawdown = (peak - point.portfolio_value) / peak;
-                if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+            if (equityCurve.length > 0) {
+                let peak = equityCurve[0].portfolio_value;
+                for (const point of equityCurve) {
+                    if (point.portfolio_value > peak) peak = point.portfolio_value;
+                    const drawdown = (peak - point.portfolio_value) / peak;
+                    if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+                }
             }
 
             return {
@@ -977,38 +984,40 @@
             }
 
             // 绘制K线图
-            const candlestick = {
-                x: currentData.dates,
-                open: currentData.open,
-                high: currentData.high,
-                low: currentData.low,
-                close: currentData.close,
-                type: 'candlestick',
-                name: 'K线',
-                increasing: { line: { color: '#26a69a' }, fillcolor: '#26a69a' },
-                decreasing: { line: { color: '#ef5350' }, fillcolor: '#ef5350' }
-            };
+            if (typeof Plotly !== 'undefined') {
+                const candlestick = {
+                    x: currentData.dates,
+                    open: currentData.open,
+                    high: currentData.high,
+                    low: currentData.low,
+                    close: currentData.close,
+                    type: 'candlestick',
+                    name: 'K线',
+                    increasing: { line: { color: '#26a69a' }, fillcolor: '#26a69a' },
+                    decreasing: { line: { color: '#ef5350' }, fillcolor: '#ef5350' }
+                };
 
-            const volume = {
-                x: currentData.dates,
-                y: currentData.volume,
-                type: 'bar',
-                name: '成交量',
-                marker: {
-                    color: currentData.close.map((c, i) => c >= currentData.open[i] ? '#26a69a' : '#ef5350')
-                },
-                yaxis: 'y2'
-            };
+                const volume = {
+                    x: currentData.dates,
+                    y: currentData.volume,
+                    type: 'bar',
+                    name: '成交量',
+                    marker: {
+                        color: currentData.close.map((c, i) => c >= currentData.open[i] ? '#26a69a' : '#ef5350')
+                    },
+                    yaxis: 'y2'
+                };
 
-            const layout = {
-                title: `${symbol} 股票价格走势`,
-                xaxis: { title: '日期', rangeslider: { visible: false } },
-                yaxis: { title: '价格', domain: [0.3, 1] },
-                yaxis2: { title: '成交量', domain: [0, 0.2] },
-                height: 500
-            };
+                const layout = {
+                    title: `${symbol} 股票价格走势`,
+                    xaxis: { title: '日期', rangeslider: { visible: false } },
+                    yaxis: { title: '价格', domain: [0.3, 1] },
+                    yaxis2: { title: '成交量', domain: [0, 0.2] },
+                    height: 500
+                };
 
-            Plotly.newPlot('priceChart', [candlestick, volume], layout);
+                Plotly.newPlot('priceChart', [candlestick, volume], layout);
+            }
         }
 
         function runBacktest() {
@@ -1042,51 +1051,53 @@
             document.getElementById('resultTrades').textContent = backtestResult.total_trades;
 
             // 绘制资金曲线
-            const equityTrace = {
-                x: backtestResult.equity_curve.map(p => p.date),
-                y: backtestResult.equity_curve.map(p => p.portfolio_value),
-                type: 'scatter',
-                mode: 'lines',
-                name: '总资产',
-                line: { color: 'blue', width: 2 }
-            };
+            if (typeof Plotly !== 'undefined' && backtestResult.equity_curve.length > 0) {
+                const equityTrace = {
+                    x: backtestResult.equity_curve.map(p => p.date),
+                    y: backtestResult.equity_curve.map(p => p.portfolio_value),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: '总资产',
+                    line: { color: 'blue', width: 2 }
+                };
 
-            const initialTrace = {
-                x: backtestResult.equity_curve.map(p => p.date),
-                y: backtestResult.equity_curve.map(() => backtestResult.initial_capital),
-                type: 'scatter',
-                mode: 'lines',
-                name: '初始资金',
-                line: { color: 'gray', dash: 'dash' }
-            };
+                const initialTrace = {
+                    x: backtestResult.equity_curve.map(p => p.date),
+                    y: backtestResult.equity_curve.map(() => backtestResult.initial_capital),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: '初始资金',
+                    line: { color: 'gray', dash: 'dash' }
+                };
 
-            const holdingsTrace = {
-                x: backtestResult.equity_curve.map(p => p.date),
-                y: backtestResult.equity_curve.map(p => p.holdings),
-                type: 'scatter',
-                mode: 'lines',
-                name: '持仓市值',
-                fill: 'tozeroy',
-                line: { color: 'orange' }
-            };
+                const holdingsTrace = {
+                    x: backtestResult.equity_curve.map(p => p.date),
+                    y: backtestResult.equity_curve.map(p => p.holdings),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: '持仓市值',
+                    fill: 'tozeroy',
+                    line: { color: 'orange' }
+                };
 
-            const cashTrace = {
-                x: backtestResult.equity_curve.map(p => p.date),
-                y: backtestResult.equity_curve.map(p => p.cash),
-                type: 'scatter',
-                mode: 'lines',
-                name: '现金',
-                line: { color: 'green' }
-            };
+                const cashTrace = {
+                    x: backtestResult.equity_curve.map(p => p.date),
+                    y: backtestResult.equity_curve.map(p => p.cash),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: '现金',
+                    line: { color: 'green' }
+                };
 
-            const equityLayout = {
-                title: `回测结果 - 总收益率: ${backtestResult.total_return_pct.toFixed(2)}%`,
-                xaxis: { title: '日期' },
-                yaxis: { title: '金额' },
-                height: 500
-            };
+                const equityLayout = {
+                    title: `回测结果 - 总收益率: ${backtestResult.total_return_pct.toFixed(2)}%`,
+                    xaxis: { title: '日期' },
+                    yaxis: { title: '金额' },
+                    height: 500
+                };
 
-            Plotly.newPlot('equityChart', [equityTrace, initialTrace, holdingsTrace, cashTrace], equityLayout);
+                Plotly.newPlot('equityChart', [equityTrace, initialTrace, holdingsTrace, cashTrace], equityLayout);
+            }
 
             // 填充交易记录
             const tradesBody = document.getElementById('tradesTableBody');
