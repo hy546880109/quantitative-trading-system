@@ -586,7 +586,20 @@ def main():
                     st.success(f"✅ 数据加载成功！共 {len(st.session_state.data)} 条记录")
 
             except Exception as e:
-                st.error(f"❌ 数据加载失败: {str(e)}")
+                error_msg = str(e).lower()
+
+                # 美股指数友好错误提示
+                if symbol.startswith('^'):
+                    if "network" in error_msg or "connection" in error_msg:
+                        st.error("⚠️ 网络连接失败，请检查网络设置后重试")
+                    elif "no data" in error_msg or "empty" in error_msg:
+                        st.error("⚠️ 暂无数据，可能是市场休市或日期范围无效")
+                    elif "rate limit" in error_msg or "too many requests" in error_msg:
+                        st.error("⚠️ 数据源繁忙，请稍后重试")
+                    else:
+                        st.error("⚠️ 美股指数数据获取失败，请稍后重试")
+                else:
+                    st.error(f"❌ 数据加载失败: {str(e)}")
 
     # 显示数据预览
     if st.session_state.data is not None:
