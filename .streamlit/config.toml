@@ -1,5 +1,6 @@
 [general]
 page_title = "量化交易系统"
+page_icon = "📈"
 
 [theme]
 primaryColor = "#1f77b4"
@@ -7,3 +8,24 @@ backgroundColor = "#ffffff"
 secondaryBackgroundColor = "#f0f2f6"
 textColor = "#262730"
 font = "sans serif"
+
+[server]
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+headless = true
+runOnSave = true
+
+[browser]
+gatherUsageStats = false
+serverAddress = "0.0.0.0"
+serverPort = 8501
+
+[runner]
+magicEnabled = true
+installTracer = false
+fixMatplotlib = true
+
+[client]
+showErrorDetails = true
+toolbarMode = "minimal"
