@@ -600,7 +600,8 @@ def main():
         with col3:
             st.metric("结束日期", st.session_state.data.index[-1].strftime('%Y-%m-%d'))
         with col4:
-            st.metric("最新收盘价", f"¥{st.session_state.data['close'].iloc[-1]:.2f}")
+            latest_close = st.session_state.data['close'].iloc[-1]
+            st.metric("最新收盘价", format_price(latest_close, symbol))
 
         # 数据表格
         st.dataframe(
