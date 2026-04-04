@@ -242,6 +242,24 @@ def get_strategy(strategy_name, params):
         )
     return MovingAverageStrategy()
 
+def format_price(price: float, symbol: str) -> str:
+    """
+    根据股票代码格式化价格显示
+
+    Args:
+        price: 价格数值
+        symbol: 股票代码
+
+    Returns:
+        格式化的价格字符串（美股指数用$，其他用¥）
+    """
+    if symbol.startswith('^'):
+        # 美股指数用美元符号，添加千位分隔符
+        return f"${price:,.2f}"
+    else:
+        # A股用人民币符号
+        return f"¥{price:,.2f}"
+
 def plot_candlestick(df, trades=None):
     """绘制K线图"""
     fig = make_subplots(rows=2, cols=1, shared_xaxes=True,
