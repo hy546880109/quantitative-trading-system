@@ -182,10 +182,142 @@
         .expandable-content.active {
             display: block;
         }
+        /* 移动端响应式适配 - 增强版 */
+
+        /* 平板设备 (< 768px) */
         @media (max-width: 768px) {
-            .sidebar { width: 100%; position: relative; height: auto; }
-            .main { margin-left: 0; }
-            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+                overflow-y: visible;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header {
+                font-size: 2rem;
+                padding: 15px;
+            }
+            .metric-number {
+                font-size: 1.2rem;
+            }
+            .metric-label {
+                font-size: 0.8rem;
+            }
+            /* 表格优化 */
+            .data-table {
+                font-size: 0.9rem;
+            }
+            .data-table th, .data-table td {
+                padding: 8px;
+            }
+            /* 图表容器 */
+            .chart-container {
+                padding: 15px;
+            }
+        }
+
+        /* 手机设备 (< 480px) */
+        @media (max-width: 480px) {
+            .header {
+                font-size: 1.5rem;
+                padding: 10px;
+            }
+            .sidebar {
+                padding: 15px;
+            }
+            .main {
+                padding: 10px;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .metric-item {
+                padding: 10px;
+            }
+            .metric-number {
+                font-size: 1rem;
+            }
+            .metric-label {
+                font-size: 0.75rem;
+            }
+            /* 按钮优化 */
+            .btn-primary, .btn-secondary {
+                padding: 12px;
+                font-size: 14px;
+            }
+            /* 输入框优化 */
+            select, input {
+                font-size: 14px;
+            }
+            /* 表格进一步优化 */
+            .data-table {
+                font-size: 0.8rem;
+            }
+            .data-table th, .data-table td {
+                padding: 6px 4px;
+            }
+            /* 标题优化 */
+            .section-title {
+                font-size: 1rem;
+            }
+            /* 增加触摸友好性 */
+            button, select, input[type="checkbox"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            /* 隐藏次要信息 */
+            .info-box {
+                padding: 8px;
+            }
+        }
+
+        /* 横屏模式 */
+        @media screen and (orientation: landscape) and (max-width: 768px) {
+            .sidebar {
+                width: 30%;
+                position: fixed;
+            }
+            .main {
+                margin-left: 30%;
+            }
+        }
+
+        /* 高分辨率设备 */
+        @media (min-width: 1920px) {
+            .sidebar {
+                width: 400px;
+            }
+            .main {
+                margin-left: 400px;
+            }
+            .header {
+                font-size: 3rem;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 20px;
+            }
+            .metric-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* 打印样式 */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .btn-primary, .btn-secondary {
+                display: none;
+            }
         }
     </style>
 </head>

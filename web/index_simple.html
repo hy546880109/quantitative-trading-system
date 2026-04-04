@@ -34,7 +34,136 @@
         .metric-label { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
         .metric-number { font-size: 1.5rem; font-weight: bold; color: #1f77b4; }
         .info-box { background: #e7f3ff; border-left: 5px solid #2196F3; padding: 10px; margin: 10px 0; border-radius: 0 5px 5px 0; }
-        @media (max-width: 768px) { .sidebar { width: 100%; position: relative; height: auto; } .main { margin-left: 0; } .metrics-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* 移动端响应式适配 - 增强版 */
+
+        /* 平板设备 (< 768px) */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+                overflow-y: visible;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header {
+                font-size: 2rem;
+                padding: 15px;
+            }
+            .metric-value, .metric-number {
+                font-size: 1.2rem;
+            }
+            .metric-label {
+                font-size: 0.8rem;
+            }
+            .data-table {
+                font-size: 0.9rem;
+            }
+            .data-table th, .data-table td {
+                padding: 8px;
+            }
+            .chart-container {
+                padding: 15px;
+            }
+        }
+
+        /* 手机设备 (< 480px) */
+        @media (max-width: 480px) {
+            .header {
+                font-size: 1.5rem;
+                padding: 10px;
+            }
+            .sidebar {
+                padding: 15px;
+            }
+            .main {
+                padding: 10px;
+            }
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            .metric-item, .metric-card {
+                padding: 10px;
+            }
+            .metric-value, .metric-number {
+                font-size: 1rem;
+            }
+            .metric-label {
+                font-size: 0.75rem;
+            }
+            .btn-primary {
+                padding: 12px;
+                font-size: 14px;
+            }
+            select, input {
+                font-size: 14px;
+            }
+            .data-table {
+                font-size: 0.8rem;
+            }
+            .data-table th, .data-table td {
+                padding: 6px 4px;
+            }
+            .section-title {
+                font-size: 1rem;
+            }
+            /* 触摸友好性 */
+            button, select, input[type="checkbox"] {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            .info-box {
+                padding: 8px;
+            }
+        }
+
+        /* 横屏模式 */
+        @media screen and (orientation: landscape) and (max-width: 768px) {
+            .sidebar {
+                width: 30%;
+                position: fixed;
+            }
+            .main {
+                margin-left: 30%;
+            }
+        }
+
+        /* 高分辨率设备 */
+        @media (min-width: 1920px) {
+            .sidebar {
+                width: 400px;
+            }
+            .main {
+                margin-left: 400px;
+            }
+            .header {
+                font-size: 3rem;
+            }
+            .metrics-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 20px;
+            }
+            .metric-value, .metric-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* 打印样式 */
+        @media print {
+            .sidebar {
+                display: none;
+            }
+            .main {
+                margin-left: 0;
+            }
+            .btn-primary {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>

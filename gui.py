@@ -30,9 +30,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 自定义CSS样式
+# 自定义CSS样式 - 移动端优化
 st.markdown("""
 <style>
+    /* 全局样式 */
     .main-header {
         font-size: 2.5rem;
         font-weight: bold;
@@ -40,6 +41,8 @@ st.markdown("""
         text-align: center;
         margin-bottom: 2rem;
     }
+
+    /* 指标卡片优化 */
     .metric-card {
         background-color: #f0f2f6;
         border-radius: 10px;
@@ -50,17 +53,115 @@ st.markdown("""
         font-size: 1.8rem;
         font-weight: bold;
     }
+
+    /* 数据表格优化 */
+    .stDataFrame {
+        overflow-x: auto;
+    }
+
+    /* 正负数颜色 */
     .positive {
         color: #28a745;
     }
     .negative {
         color: #dc3545;
     }
+
+    /* 信息框 */
     .info-box {
         background-color: #e7f3ff;
         border-left: 5px solid #2196F3;
         padding: 10px;
         margin: 10px 0;
+    }
+
+    /* 移动端响应式适配 */
+    @media only screen and (max-width: 768px) {
+        /* 调整标题大小 */
+        .main-header {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        /* 优化侧边栏 */
+        section[data-testid="stSidebar"] {
+            width: 100% !important;
+        }
+
+        /* 优化指标卡片 */
+        .metric-value {
+            font-size: 1.2rem;
+        }
+
+        /* 优化数据表格 */
+        .stDataFrame table {
+            font-size: 0.85rem;
+        }
+
+        /* 优化按钮 */
+        .stButton button {
+            width: 100%;
+            padding: 8px;
+        }
+
+        /* 优化输入框 */
+        .stSelectbox, .stSlider, .stNumberInput, .stTextInput {
+            font-size: 0.9rem;
+        }
+
+        /* 优化图表高度 */
+        .js-plotly-plot {
+            height: 400px !important;
+        }
+
+        /* 优化expander */
+        .streamlit-expanderContent {
+            padding: 10px;
+        }
+    }
+
+    /* 超小屏幕优化 (< 480px) */
+    @media only screen and (max-width: 480px) {
+        .main-header {
+            font-size: 1.5rem;
+        }
+
+        .metric-value {
+            font-size: 1rem;
+        }
+
+        /* 隐藏部分次要信息 */
+        .stMarkdown h3 {
+            font-size: 1rem;
+        }
+
+        /* 增加触摸友好性 */
+        button, select, input {
+            min-height: 44px;
+        }
+    }
+
+    /* 横屏模式优化 */
+    @media screen and (orientation: landscape) and (max-width: 768px) {
+        section[data-testid="stSidebar"] {
+            width: 30% !important;
+        }
+
+        .main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+    }
+
+    /* 高分辨率设备 */
+    @media only screen and (min-width: 1920px) {
+        .main-header {
+            font-size: 3rem;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
