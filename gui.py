@@ -463,25 +463,38 @@ def main():
         # 数据源配置
         st.subheader("📊 数据源")
 
-        # 检查是否为美股指数
+        # 根据股票类别自动选择数据源
         if stock_category == "🇺🇸 美股指数":
             # 美股指数强制使用Yahoo Finance
             st.info("ℹ️ 美股指数使用 Yahoo Finance 数据源")
-            data_source = st.selectbox(
-                "选择数据源",
-                ["Yahoo Finance"],
-                disabled=True,
-                help="美股指数仅支持Yahoo Finance数据源"
-            )
-        else:
-            # 其他分类正常选择数据源
-            data_source = st.selectbox(
-                "选择数据源",
-                ["模拟数据", "TuShare", "Yahoo Finance"]
-            )
+            data_source = "Yahoo Finance"
+            st.markdown(f"**数据源**: {data_source}")
 
+        elif stock_category == "🌐 美股热门":
+            # 美股个股强制使用Yahoo Finance
+            st.info("ℹ️ 美股使用 Yahoo Finance 数据源")
+            data_source = "Yahoo Finance"
+            st.markdown(f"**数据源**: {data_source}")
+
+        elif stock_category == "🧪 测试用":
+            # 测试用使用模拟数据
+            st.info("ℹ️ 测试模式使用模拟数据")
+            data_source = "模拟数据"
+            st.markdown(f"**数据源**: {data_source}")
+
+        else:
+            # A股（热门A股、主要指数）强制使用TuShare
+            st.info("ℹ️ A股使用 TuShare 数据源")
+            data_source = "TuShare"
+            st.markdown(f"**数据源**: {data_source}")
+
+        # TuShare Token配置
         if data_source == "TuShare":
-            token = st.text_input("TuShare Token", type="password")
+            token = st.text_input(
+                "TuShare Token",
+                type="password",
+                help="访问 https://tushare.pro 获取Token"
+            )
         else:
             token = None
 
