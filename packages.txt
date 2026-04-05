@@ -1,3 +1,1 @@
-# System packages for Streamlit Cloud
-# Required for matplotlib and some data processing libraries
 libffi-dev
