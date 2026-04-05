@@ -10,8 +10,8 @@
           - paragraph [ref=e29]: 选择股票类别
           - generic [ref=e31]:
             - generic [ref=e32]:
-              - generic [ref=e33]: 📊 主要指数
-              - combobox "Selected 📊 主要指数. 选择股票类别" [ref=e473]
+              - generic [ref=e33]: 📊 A股指数
+              - combobox "Selected 📊 A股指数. 选择股票类别" [ref=e473]
             - img "open" [ref=e37]
         - generic [ref=e475]:
           - paragraph [ref=e479]: 选择股票

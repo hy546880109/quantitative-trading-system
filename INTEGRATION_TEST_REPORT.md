@@ -56,7 +56,7 @@
 
 #### Test 2.1: Category Switch
 - **Status:** ✅ PASS
-- **Action:** Switched from "🇺🇸 美股指数" to "📊 主要指数"
+- **Action:** Switched from "🇺🇸 美股指数" to "📊 A股指数"
 - **Result:** Category changed successfully
 - **Default Symbol:** 000001.SH - 上证指数
 
@@ -109,7 +109,7 @@
 - **Status:** ✅ PASS
 - **Options Available:**
   - 🔥 热门A股
-  - 📊 主要指数
+  - 📊 A股指数
   - 🇺🇸 美股指数 (NEW)
   - 🌐 美股热门
   - 🧪 测试用

@@ -171,8 +171,8 @@
       - generic [ref=e447]:
         - option "🔥 热门A股" [ref=e448] [cursor=pointer]:
           - generic [ref=e452]: 🔥 热门A股
-        - option "📊 主要指数" [ref=e453] [cursor=pointer]:
-          - generic [ref=e457]: 📊 主要指数
+        - option "📊 A股指数" [ref=e453] [cursor=pointer]:
+          - generic [ref=e457]: 📊 A股指数
         - option "🇺🇸 美股指数" [selected] [ref=e458] [cursor=pointer]:
           - generic [ref=e462]: 🇺🇸 美股指数
         - option "🌐 美股热门" [ref=e463] [cursor=pointer]:

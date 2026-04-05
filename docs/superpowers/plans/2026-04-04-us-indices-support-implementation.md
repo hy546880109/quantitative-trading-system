@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** 在量化交易系统中添加美股主要指数（标普500、纳斯达克、道琼斯）支持，保障获取真实数据，不影响现有功能。
+**Goal:** 在量化交易系统中添加美股A股指数（标普500、纳斯达克、道琼斯）支持，保障获取真实数据，不影响现有功能。
 
 **Architecture:** 采用最小改动方案，在现有gui.py中添加美股指数分类，自动锁定数据源为Yahoo Finance，智能价格格式化，友好错误提示。后端在data_feed.py中处理指数代码转换。
 
@@ -35,7 +35,7 @@
 
 - [ ] **Step 1: 在popular_stocks字典中添加美股指数分类**
 
-在 `gui.py` 的 `popular_stocks` 字典中，在"📊 主要指数"和"🌐 美股热门"之间插入新的美股指数分类：
+在 `gui.py` 的 `popular_stocks` 字典中，在"📊 A股指数"和"🌐 美股热门"之间插入新的美股指数分类：
 
 ```python
 popular_stocks = {
@@ -51,7 +51,7 @@ popular_stocks = {
         "600276.SH": "恒瑞医药",
         "601012.SH": "隆基绿能"
     },
-    "📊 主要指数": {
+    "📊 A股指数": {
         "000001.SH": "上证指数",
         "399001.SZ": "深证成指",
         "399006.SZ": "创业板指",
@@ -154,7 +154,7 @@ streamlit run gui.py
 测试步骤：
 1. 选择"🔥 热门A股" → 数据源应可正常选择
 2. 选择"🇺🇸 美股指数" → 数据源应自动锁定为Yahoo Finance并灰显
-3. 切换回"📊 主要指数" → 数据源应恢复正常选择
+3. 切换回"📊 A股指数" → 数据源应恢复正常选择
 
 Expected: 美股指数分类下数据源锁定为Yahoo Finance，其他分类正常
 
@@ -272,7 +272,7 @@ streamlit run gui.py
 ```
 
 测试步骤：
-1. 选择"📊 主要指数" → "上证指数" → 加载数据
+1. 选择"📊 A股指数" → "上证指数" → 加载数据
    - Expected: 最新收盘价显示为 "¥3,0XX.XX"
 2. 选择"🇺🇸 美股指数" → "标普500" → 加载数据
    - Expected: 最新收盘价显示为 "$4,XXX.XX"
@@ -445,7 +445,7 @@ git commit -m "feat: 支持美股指数代码处理
 ```markdown
 ### 📊 支持的指数
 
-#### A股主要指数
+#### A股A股指数
 - 上证指数 (000001.SH)
 - 深证成指 (399001.SZ)
 - 创业板指 (399006.SZ)
@@ -455,7 +455,7 @@ git commit -m "feat: 支持美股指数代码处理
 
 **数据源**: TuShare 或 Yahoo Finance
 
-#### 美股主要指数 🆕
+#### 美股A股指数 🆕
 - 标普500 (^GSPC)
 - 纳斯达克指数 (^IXIC)
 - 道琼斯指数 (^DJI)
@@ -625,7 +625,7 @@ streamlit run gui.py
 - [ ] 同样测试纳斯达克 (^IXIC) 和道琼斯 (^DJI)
 
 **A股功能回归测试：**
-- [ ] 切换到"📊 主要指数"
+- [ ] 切换到"📊 A股指数"
 - [ ] 数据源选择恢复正常
 - [ ] 选择上证指数 (000001.SH)
 - [ ] 加载数据成功

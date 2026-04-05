@@ -156,7 +156,7 @@ Local URL: http://localhost:8504
 | 股票类别 | 预期数据源 | 实际数据源 | 状态 |
 |---------|-----------|-----------|------|
 | 🔥 热门A股 | TuShare | TuShare | ✅ 正确 |
-| 📊 主要指数 | TuShare | TuShare | ✅ 正确 |
+| 📊 A股指数 | TuShare | TuShare | ✅ 正确 |
 | 🇺🇸 美股指数 | Yahoo Finance | Yahoo Finance | ✅ 正确 |
 | 🌐 美股热门 | Yahoo Finance | Yahoo Finance | ✅ 正确 |
 | 🧪 测试用 | 模拟数据 | 模拟数据 | ✅ 正确 |
