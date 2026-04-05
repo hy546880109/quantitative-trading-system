@@ -482,7 +482,7 @@ def main():
         with col1:
             start_date = st.date_input(
                 "开始日期",
-                value=datetime.now() - timedelta(days=365)
+                value=datetime.now() - timedelta(days=365*3)
             )
         with col2:
             end_date = st.date_input(
