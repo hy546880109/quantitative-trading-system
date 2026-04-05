@@ -70,9 +70,9 @@ streamlit run gui.py
 - 上证50 (000016.SH)
 - 中证500 (000905.SH)
 
-**数据源**: TuShare（自动锁定）
+**数据源**: Yahoo Finance（自动锁定）
 
-**注意**: A股自动使用TuShare数据源，需提供Token。
+**注意**: A股和美股统一使用Yahoo Finance数据源，无需配置Token。
 
 #### 美股主要指数 🆕
 - 标普500 (^GSPC)
@@ -81,7 +81,7 @@ streamlit run gui.py
 
 **数据源**: Yahoo Finance（自动锁定）
 
-**注意**: 美股自动使用Yahoo Finance数据源，无需配置Token。
+**注意**: 无需Token，直接获取真实数据。
 
 #### 美股热门
 - 苹果公司 (AAPL)
@@ -94,6 +94,8 @@ streamlit run gui.py
 - 阿里巴巴 (BABA)
 
 **数据源**: Yahoo Finance（自动锁定）
+
+**注意**: 无需Token，直接获取真实数据。
 
 ---
 
