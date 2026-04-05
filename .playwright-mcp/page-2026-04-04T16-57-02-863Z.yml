@@ -1,0 +1,160 @@
+- generic [ref=e2]:
+  - generic [ref=e7]:
+    - button "keyboard_double_arrow_left" [ref=e10] [cursor=pointer]:
+      - generic [ref=e12]: keyboard_double_arrow_left
+    - generic [ref=e15]:
+      - heading "⚙️ 系统配置" [level=2] [ref=e19]
+      - heading "📈 股票代码" [level=3] [ref=e23]
+      - generic [ref=e25]:
+        - paragraph [ref=e29]: 选择股票类别
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: 📊 主要指数
+            - combobox "Selected 📊 主要指数. 选择股票类别" [active] [ref=e473]
+          - img "open" [ref=e37]
+      - generic [ref=e475]:
+        - paragraph [ref=e479]: 选择股票
+        - generic [ref=e481]:
+          - generic [ref=e482]:
+            - generic [ref=e483]: 000001.SH - 上证指数
+            - combobox "Selected 000001.SH - 上证指数. 选择股票" [ref=e485]
+          - img "open" [ref=e487]
+      - alert [ref=e56]:
+        - paragraph [ref=e61]:
+          - strong [ref=e62]: 当前股票代码
+          - text: ":"
+          - code [ref=e63]: 000001.SH
+      - generic [ref=e66] [cursor=pointer]:
+        - checkbox "手动输入股票代码"
+        - paragraph [ref=e71]: 手动输入股票代码
+      - heading "📊 数据源" [level=3] [ref=e75]
+      - generic [ref=e490]:
+        - paragraph [ref=e494]: 选择数据源
+        - generic [ref=e496]:
+          - generic [ref=e497]:
+            - generic [ref=e498]: 模拟数据
+            - combobox "Selected 模拟数据. 选择数据源" [ref=e500]
+          - img "open" [ref=e502]
+      - generic [ref=e505]:
+        - generic [ref=e509]:
+          - paragraph [ref=e513]: 开始日期
+          - textbox "Select a date." [ref=e517]:
+            - /placeholder: YYYY/MM/DD
+            - text: 2025/04/05
+          - paragraph: Press the down arrow key to interact with the calendar and select a date. Press the escape button to close the calendar.
+          - paragraph: Selected date is 2025/04/05. Select the second date.
+        - generic [ref=e521]:
+          - paragraph [ref=e525]: 结束日期
+          - textbox "Select a date." [ref=e529]:
+            - /placeholder: YYYY/MM/DD
+            - text: 2026/04/05
+          - paragraph: Press the down arrow key to interact with the calendar and select a date. Press the escape button to close the calendar.
+          - paragraph: Selected date is 2026/04/05. Select the second date.
+      - heading "🎯 交易策略" [level=3] [ref=e533]
+      - generic [ref=e122]:
+        - paragraph [ref=e126]: 选择策略
+        - generic [ref=e128]:
+          - generic [ref=e129]:
+            - generic [ref=e130]: 移动平均线策略 (MA)
+            - combobox "Selected 移动平均线策略 (MA). 选择策略" [ref=e132]
+          - img "open" [ref=e134]
+      - generic [ref=e138]:
+        - paragraph [ref=e142]: 短期窗口
+        - generic [ref=e143]:
+          - slider "短期窗口" [ref=e147]:
+            - generic:
+              - generic:
+                - paragraph: "10"
+          - generic:
+            - generic:
+              - paragraph: "5"
+            - generic:
+              - paragraph: "50"
+      - generic [ref=e151]:
+        - paragraph [ref=e155]: 长期窗口
+        - generic [ref=e156]:
+          - slider "长期窗口" [ref=e160]:
+            - generic:
+              - generic:
+                - paragraph: "30"
+          - generic:
+            - generic:
+              - paragraph: "20"
+            - generic:
+              - paragraph: "200"
+      - heading "💰 资金配置" [level=3] [ref=e537]
+      - generic [ref=e167]:
+        - paragraph [ref=e171]: 初始资金 (¥)
+        - generic [ref=e172]:
+          - spinbutton "初始资金 (¥)" [ref=e175]: "100000"
+          - generic [ref=e176]:
+            - button [ref=e177] [cursor=pointer]:
+              - img [ref=e178]
+            - button [ref=e180] [cursor=pointer]:
+              - img [ref=e181]
+      - separator [ref=e542]
+      - button "📥 加载数据" [ref=e190] [cursor=pointer]:
+        - paragraph [ref=e194]: 📥 加载数据
+      - button "🚀 运行回测" [ref=e197] [cursor=pointer]:
+        - paragraph [ref=e201]: 🚀 运行回测
+  - generic [ref=e3]:
+    - banner
+    - generic [ref=e204]:
+      - generic [ref=e209]: 📈 量化交易系统 v1.0
+      - group [ref=e545]:
+        - generic "keyboard_arrow_down 📖 使用说明" [ref=e546] [cursor=pointer]:
+          - generic [ref=e547]:
+            - generic [ref=e549]: keyboard_arrow_down
+            - paragraph [ref=e552]: 📖 使用说明
+        - generic [ref=e558]:
+          - heading "使用步骤" [level=3] [ref=e560]:
+            - text: 使用步骤
+            - generic [ref=e561]:
+              - link "Link to heading":
+                - /url: "#ab0979d2"
+                - img
+          - list [ref=e562]:
+            - listitem [ref=e563]:
+              - strong [ref=e564]: 配置数据源
+              - text: ：选择数据源类型（模拟数据/TuShare/Yahoo Finance），输入股票代码
+            - listitem [ref=e565]:
+              - strong [ref=e566]: 设置策略参数
+              - text: ：选择交易策略并调整参数
+            - listitem [ref=e567]:
+              - strong [ref=e568]: 设置资金
+              - text: ：输入初始资金金额
+            - listitem [ref=e569]:
+              - strong [ref=e570]: 加载数据
+              - text: ：点击"加载数据"按钮
+            - listitem [ref=e571]:
+              - strong [ref=e572]: 运行回测
+              - text: ：点击"运行回测"按钮查看结果
+          - heading "支持的数据源" [level=3] [ref=e574]:
+            - text: 支持的数据源
+            - generic [ref=e575]:
+              - link "Link to heading":
+                - /url: "#ee8426d7"
+                - img
+          - list [ref=e576]:
+            - listitem [ref=e577]:
+              - strong [ref=e578]: 模拟数据
+              - text: ：生成随机模拟数据，无需配置
+            - listitem [ref=e579]:
+              - strong [ref=e580]: TuShare
+              - text: ：需要TuShare Token，支持A股数据
+            - listitem [ref=e581]:
+              - strong [ref=e582]: Yahoo Finance
+              - text: ：无需Token，支持全球股票
+          - heading "支持的交易策略" [level=3] [ref=e584]:
+            - text: 支持的交易策略
+            - generic [ref=e585]:
+              - link "Link to heading":
+                - /url: "#78f43c00"
+                - img
+          - list [ref=e586]:
+            - listitem [ref=e587]: 移动平均线策略 (MA)
+            - listitem [ref=e588]: RSI策略
+            - listitem [ref=e589]: MACD策略
+            - listitem [ref=e590]: 布林带策略
+            - listitem [ref=e591]: KDJ策略
+            - listitem [ref=e592]: EMA策略

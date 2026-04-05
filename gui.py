@@ -1,5 +1,5 @@
 """
-量化交易系统GUI界面
+量化交易系统GUI界面 v2.1
 使用Streamlit实现的Web应用程序
 运行: streamlit run gui.py
 """
